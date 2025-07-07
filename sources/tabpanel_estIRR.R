@@ -16,7 +16,7 @@ tabpanel_estIRR <- tabPanel(
         ## uplaod file and output panels
          sidebarLayout(
            sidebarPanel(
-             h5("Step 1"),
+             h2("Step 1"),
              fileInput("file1", "Upload your data", accept = c(".rds", ".Rdat", ".csv", ".txt")),
              uiOutput("col")
              
@@ -36,12 +36,21 @@ tabpanel_estIRR <- tabPanel(
         ## 
         sidebarLayout(
           sidebarPanel(
-            h5("Step 2"),
-            uiOutput("subject"),
-            uiOutput("rater"),
-            uiOutput("Y"),
-        #tags$hr(),
+            h2("Step 2"),
+            fluidRow( # fluidrow used to make a 2x2 grid for the options
+              column(6, uiOutput("format")),
+              column(6, uiOutput("subject")),
+              column(6, uiOutput("rater")),
+              column(6, uiOutput("Y"))
+            ),
+            uiOutput("estimatebutton")
           ),
-        mainPanel()
+          mainPanel(
+            tabsetPanel(
+              tabPanel("Intra-Class Correlations (ICCs)", uiOutput("ICCs")),
+              tabPanel("Variances", uiOutput("variances")),
+              tabPanel("Rater Design", uiOutput("raterDesign"))
+            )
+          )
         )
 )
