@@ -47,7 +47,20 @@ tabpanel_estIRR <- tabPanel(
           ),
           mainPanel(
             tabsetPanel(
-              tabPanel("Intra-Class Correlations (ICCs)", uiOutput("ICCs")),
+              #tabPanel("Intra-Class Correlations (ICCs)", uiOutput("ICCs")),
+              tabPanel("Intra-Class Correlations (ICCs)",
+                       page_fillable(
+                         layout_columns(
+                           card(uiOutput("icca1")),
+                           card(uiOutput("iccak")),
+                           card(uiOutput("iccakhat")),
+                           card(uiOutput("iccc1")),
+                           card(uiOutput("iccck")),
+                           card(uiOutput("iccqkhat")),
+                           col_widths = rep(6,6) ## max is 12 so 2x6 in each row
+                         )
+                       )
+                       ),
               tabPanel("Variances", uiOutput("variances")),
               tabPanel("Rater Design", uiOutput("raterDesign"))
             )
