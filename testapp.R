@@ -6,9 +6,9 @@ lapply(list.files("sources/"), \(x) source(paste0("sources/",x)))
 ## MANUAL
 source("ICCfunctions_tj.R")
 ui <- navbarPage("ICC4IRR", # App title
-                 theme = "my_style.css",
+                 theme = bs_theme(preset = "lux"),
                  #input_dark_mode(id = "mode"),
-                 tabpanel_home,
+                 #tabpanel_home,
                  tabpanel_estIRR,
                  tabpanel_flow,
                  tabpanel_estQk,
@@ -57,24 +57,27 @@ server <- function(input, output, session) {
   output$subject <- renderUI({
     req(data1())
     selectInput("subject",
-                label = HTML("Select column name for <b style='text-shadow: 1px 1px 1px rgba(0,0,0,0.4);'>subjects</b>:"),
+                label = HTML("Select column name for <b style='text-shadow: .5px .5px .5px rgba(0,0,0,0.4);'>subjects</b>:"),
                 choices = names(data1()), 
+                selected = "subject", ## only for development !! @todo
                 multiple = FALSE)
   })
   # raters
   output$rater <- renderUI({
     req(data1())
     selectInput("rater", 
-                label = HTML("Select column name for <b style='text-shadow: 1px 1px 1px rgba(0,0,0,0.4);'>raters</b>:"),
+                label = HTML("Select column name for <b style='text-shadow: .5px .5px .5px rgba(0,0,0,0.4);'>raters</b>:"),
                 choices = names(data1()), 
+                selected = "rater", ## only for development !! @todo
                 multiple = FALSE)
   })
   ## ratings
   output$Y <- renderUI({
     req(data1())
     selectInput("Y", 
-                label = HTML("Select column name for <b style='text-shadow: 1px 1px 1px rgba(0,0,0,0.4);'>ratings</b>:"),
+                label = HTML("Select column name for <b style='text-shadow: .5px .5px .5px rgba(0,0,0,0.4);'>ratings</b>:"),
                 choices = names(data1()), 
+                selected = "Y", ## only for development !! @todo
                 multiple = FALSE)
   })
   ## ##.... LONG - WIDE
@@ -89,9 +92,10 @@ server <- function(input, output, session) {
   
   output$estimatebutton <- renderUI({
     req(data1())
-    actionButton("estimateICCs", "Estimate ICCs", icon = icon("cogs"), 
-                 style = "color: white; background-color: #7c97f2; border-color: #7c97f2; 
-                      border-radius: 6px; padding: 8px 16px; font-size: 16px; font-weight: bold;")
+    actionButton("estimateICCs", "Estimate ICCs", icon = icon("cogs"))
+                 #, 
+                 #style = "color: white; background-color: #7c97f2; border-color: #7c97f2; 
+                 #     border-radius: 6px; padding: 8px 16px; font-size: 16px; font-weight: bold;")
   })
   # model
   model <- eventReactive(input$estimateICCs, { ## BUTTON!!!
@@ -132,7 +136,78 @@ server <- function(input, output, session) {
     req(model()$ICCs)
     model()$ICCs
   }, rownames = TRUE)
+  ## Output per ICC for better print:
+  output$icca1 <- renderUI({
+    req(model()$ICCs)
+    withMathJax(
+      paste0("$$ICC(A,1) = ", round(model()$ICCs[1, 1], 2), ", \\; ",
+             "95\\%~CI~[", round(model()$ICCs[1, 2], 2), ",\\; ",
+             round(model()$ICCs[1, 3], 2), "], \\; ",
+             "SE = ", round(model()$ICCs[1, 4], 2), "$$"))
+  })
+  output$iccak <- renderUI({
+    req(model()$ICCs)
+    withMathJax(
+      paste0("$$ICC(A,k) = ", round(model()$ICCs[2, 1], 2), ", \\; ",
+             "95\\%~CI~[", round(model()$ICCs[2, 2], 2), ",\\; ",
+             round(model()$ICCs[2, 3], 2), "], \\; ",
+             "SE = ", round(model()$ICCs[2, 4], 2), "$$"))
+  })
+  output$iccakhat <- renderUI({
+    req(model()$ICCs)
+    withMathJax(
+      paste0("$$ICC(A,\\widehat{k}) = ", round(model()$ICCs[3, 1], 2), ", \\; ",
+             "95\\%~CI~[", round(model()$ICCs[3, 2], 2), ",\\; ",
+             round(model()$ICCs[3, 3], 2), "], \\; ",
+             "SE = ", round(model()$ICCs[3, 4], 2), "$$"))
+  })
+  output$iccc1 <- renderUI({
+    req(model()$ICCs)
+    withMathJax(
+      paste0("$$ICC(C,1) = ", round(model()$ICCs[4, 1], 2), ", \\; ",
+             "95\\%~CI~[", round(model()$ICCs[4, 2], 2), ",\\; ",
+             round(model()$ICCs[4, 3], 2), "], \\; ",
+             "SE = ", round(model()$ICCs[4, 4], 2), "$$"))
+  })
+  output$iccck <- renderUI({
+    req(model()$ICCs)
+    withMathJax(
+      paste0("$$ICC(C,k) = ", round(model()$ICCs[5, 1], 2), ", \\; ",
+             "95\\%~CI~[", round(model()$ICCs[5, 2], 2), ",\\; ",
+             round(model()$ICCs[5, 3], 2), "], \\; ",
+             "SE = ", round(model()$ICCs[5, 4], 2), "$$"))
+  })
+  output$iccqkhat <- renderUI({
+    req(model()$ICCs)
+    withMathJax(
+      paste0("$$ICC(Q,\\widehat{k}) = ", round(model()$ICCs[6, 1], 2), ", \\; ",
+             "95\\%~CI~[", round(model()$ICCs[6, 2], 2), ",\\; ",
+             round(model()$ICCs[6, 3], 2), "], \\; ",
+             "SE = ", round(model()$ICCs[6, 4], 2), "$$"))
+  })
   
+  ## ICC card output from UI:
+  # put it here instead of UI bc we use req()
+  custom_card_style <- "
+    background: linear-gradient(45deg, #f5f5f5, #f6f6f6);
+    border: none;
+    border-radius: 0px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  "
+  output$icc_cards<- renderUI({
+    req(model()$ICCs)
+    page_fillable(
+      layout_columns(
+        card(uiOutput("icca1")   , style = custom_card_style ),
+        card(uiOutput("iccak")   , style = custom_card_style ),
+        card(uiOutput("iccakhat"), style = custom_card_style),
+        card(uiOutput("iccc1")   , style = custom_card_style ),
+        card(uiOutput("iccck")   , style = custom_card_style ),
+        card(uiOutput("iccqkhat"), style = custom_card_style),
+        col_widths = rep(6, 6)
+      )
+    )
+  })
   output$variances <- renderTable({
     req(model()$variances)
     model()$variances
@@ -308,12 +383,13 @@ server <- function(input, output, session) {
     rv$path_summary <- paste(path_details, collapse = "\n")
   })
   
-  # Render the final ICC result
+  # inal ICC result
+  # @todo make it nice
   output$icc_result <- renderText({
     rv$Ans
   })
   
-  # Render the path summary
+  # path summary
   output$path_summary <- renderText({
     rv$path_summary
   })
@@ -324,5 +400,5 @@ server <- function(input, output, session) {
   
 }
 
-options(shiny.port = 7001)
+options(shiny.port = 8001)
 shinyApp(ui, server)
