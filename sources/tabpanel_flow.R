@@ -18,13 +18,13 @@ tabpanel_flow <- tabPanel(
   sidebarLayout(
     sidebarPanel(
       # Step 1: Crossed or Nested
-      selectInput("step1", "1. Is the Observational Design Crossed or Nested?",
+      selectInput("step1", "Is the Observational Design Crossed or Nested?",
                   choices = c("Please Select" = "", "Crossed", "Nested")),
       
       # Step 2: Relative or Absolute (conditional on Step 1 == "C")
       conditionalPanel(
         condition = "input.step1 == 'Crossed'",
-        selectInput("step2", "2. Are Ratings Used for Absolute or Relative
+        selectInput("step2", "Are Ratings Used for Absolute or Relative
 Inferences?",
                     choices = c("Please Select" = "", "Absolute", "Relative"))
       ),
@@ -32,7 +32,7 @@ Inferences?",
       # Step 3: Single or Average (conditional on Step 1 or Step 2)
       conditionalPanel(
         condition = "input.step1 != '' && (input.step1 == 'Nested' || input.step2 != '')",
-        selectInput("step3", "3. Are Single or Average Ratings Used??",
+        selectInput("step3", "Are Single or Average Ratings Used??",
                     choices = c("Please Select" = "", "Single", "Average"))
       ),
       
@@ -53,9 +53,10 @@ Inferences?",
       hr(), # Horizontal rule for separation
       
       # Reset button
-      actionButton("reset_button", "Reset All Selections", icon = icon("times"),
-                   style = "color: white; background-color: #f5ad5f; border-color: #f5ad5f; 
-                      border-radius: 6px; padding: 8px 16px; font-size: 16px; font-weight: bold;")
+      actionButton("reset_button", "Reset All Selections", icon = icon("times"))
+                   #,
+                   #style = "color: white; background-color: #f5ad5f; border-color: #f5ad5f; 
+                   #   border-radius: 6px; padding: 8px 16px; font-size: 16px; font-weight: bold;")
     ),
     
     # Main panel for displaying output
