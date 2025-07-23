@@ -318,7 +318,8 @@ server <- function(input, output, session) {
   
   # Main reactive expression to determine the ICC based on current selections
   observe({
-    current_Ans <- "Please make your selections to determine the ICC."
+    #current_Ans <- "Please make your selections to determine the ICC."
+    current_Ans <- "..." #changed to dots bc of mathjax
     path_details <- c()
     
     # Replicate the flow logic
@@ -372,7 +373,7 @@ server <- function(input, output, session) {
             current_Ans <- ICCs[3] # ICC(C,k)
           } else if (rv$step4_1 == "Incomplete") {
             path_details <- c(path_details, paste0("Step 4.1: Incomplete (", rv$step4_1, ")"))
-            current_Ans <- ICCs[4] # ICC(Q,k)
+            current_Ans <- ICCs[4] # ICC(Q,khat)
           }
         }
       }
@@ -385,14 +386,14 @@ server <- function(input, output, session) {
   
   # inal ICC result
   # @todo make it nice
-  output$icc_result <- renderText({
-    rv$Ans
+  output$icc_result <- renderUI({
+    withMathJax(paste0("$$", rv$Ans, "$$"))
   })
   
   # path summary
-  output$path_summary <- renderText({
-    rv$path_summary
-  })
+  #output$path_summary <- renderText({
+  #  rv$path_summary
+  #})
   
 
 # -------------------------------------------------------------------------
