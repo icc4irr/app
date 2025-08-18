@@ -5,10 +5,7 @@
 ##          (change data$rater to data[[raters]], likewise for subjects,
 ##           calculate a single table, fix how (in)complete is checked)
 
-## Supplement 2: ICC functions 
-##    - computeQkhat: Computes Q and khat from observational design
-##    - computekhat: Computes khat from observational design
-##    - estICCs: Estimates ICCs and variance components with MCMC and MLE4
+## UPDATED AUGUST 2025 for Shiny app: lines 73, 99 NA instead of NULL
 
 ## Required packages:
 ## - brms
@@ -67,13 +64,13 @@ estICCs <- function(data,
                     subjects = "subjects", 
                     raters = "raters", 
                     level = .95,
-                    k = NULL, 
-                    khat = NULL, 
-                    Q = NULL, 
+                    k = NA, 
+                    khat = NA, 
+                    Q = NA, 
                     estimator = "MLE") {
   
   ## Number of raters
-  if(is.null(k)){
+  if(is.na(k)){
     k <- length(unique(data[[raters]]))
   }
   
@@ -99,7 +96,7 @@ estICCs <- function(data,
     twoWay <- TRUE
   }
   
-  if (is.null(khat) | is.null(Q)) {
+  if (is.na(khat) | is.na(Q)) {
     ## Decide on values for khat and q 
     if (balanced == T & complete == T) { 
       khat <- k

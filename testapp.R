@@ -16,7 +16,11 @@ ui <- navbarPage("ICC4IRR", # App title
                  tabpanel_flow,
                  tabpanel_compQkhat,
                  tabpanel_estQk,
-                 tabpanel_about)
+                 tabpanel_about,
+                 footer = tags$footer(
+                   style = "width:100%; text-align:center; padding:10px; position:fixed; bottom:0; background-color:#f8f9fa;",
+                   HTML("&copy; 2025. See 'About' page for citation info.")
+                 ))
 
 
 server <- function(input, output, session) {
@@ -106,14 +110,48 @@ server <- function(input, output, session) {
                  #style = "color: white; background-color: #7c97f2; border-color: #7c97f2; 
                  #     border-radius: 6px; padding: 8px 16px; font-size: 16px; font-weight: bold;")
   })
-  # model
+  
+  ## Step 3 options:
+  #numericInput(inputId = "k", "Total number of raters (k):", NA),
+  #numericInput(inputId = "khat", "Number of raters per subject (khat):", NA),
+  #numericInput(inputId = "Q", "Proportion non-overlapping ratings (Q):", NA),
+  output$k_input <- renderUI({
+    req(data1())
+    tagList( # for math
+      withMathJax(),
+      numericInput("k_input", 
+                label = HTML("Total number <br> of raters <br> (\\(k\\))"), 
+                value = NA)
+    )
+  })
+  output$khat_input <- renderUI({
+    req(data1())
+    tagList( # for math
+      withMathJax(),
+      numericInput("khat_input",
+                   label = HTML("Number of raters per subject (\\(\\widehat{k}\\))"),
+                   value = NA)
+      )
+    })
+  
+  output$Q_input <- renderUI({
+    req(data1())
+    tagList( # for math
+      withMathJax(),
+      numericInput("Q_input", 
+                 label = HTML("Prop. non-overlapping ratings (\\(Q\\))"),
+                 value = NA)
+    )
+  })
+  
+  # model output:
   model <- eventReactive(input$estimateICCs, { 
     # Analyses for Plausible values
     if(input$format == "PVs"){
       dataset <- data1()
       set.seed(12345)
       ICCsests <- estICC_PVs(dataset, subjects = input$subject, raters = input$rater,
-                             k = input$k, khat = input$khat, Q = input$Q)
+                             k = input$k_input, khat = input$khat_input, Q = input$Q_input)
       
     } else {req(data1())
       # Analyses for Observed variables
@@ -133,7 +171,7 @@ server <- function(input, output, session) {
       ICCsests <- estICCs(dataset, Y = input$Y, subjects = input$subject, raters = input$rater,
                           estimator = "MLE", 
                           #response = "continuous", 
-                          #k = input$k, khat = input$khat, Q = input$Q
+                          k = input$k_input, khat = input$khat_input, Q = input$Q_input
                           )
       # Als MCMC weer erin gaat, dan estimator = input$estimator
       # Als binary response weer erin gaat dan response = input$response, 

@@ -13,7 +13,8 @@ tabpanel_estIRR <- tabPanel(
                              #   tags$li("Click Estimate IRR & inspect the results")
                              # )
                             ),
-        ## uplaod file and output panels
+        ## STEP 1                    
+        ## Upload file and output panels
          sidebarLayout(
            sidebarPanel(
              h2("Step 1"),
@@ -33,7 +34,8 @@ tabpanel_estIRR <- tabPanel(
              )
            )
          ),
-        ## 
+        ##
+        ## STEP 2
         sidebarLayout(
           sidebarPanel(
             h2("Step 2"),
@@ -42,18 +44,36 @@ tabpanel_estIRR <- tabPanel(
               column(6, uiOutput("subject")),
               column(6, uiOutput("rater")),
               column(6, uiOutput("Y"))
-            ),
-            uiOutput("estimatebutton")
+            )
+            #,
+            #uiOutput("estimatebutton")
           ),
           mainPanel(
             tabsetPanel(
-              tabPanel("Intra-Class Correlations (ICCs)",
-                       uiOutput("icc_cards")), # fix the cards style in server
               tabPanel("Variances", 
                        uiOutput("variances_cards")),
               tabPanel("Rater Design", 
-                       uiOutput("RaterDesign_cards"))
+                       uiOutput("RaterDesign_cards")),
+              tabPanel("Intra-Class Correlations (ICCs)",
+                       uiOutput("icc_cards")) # fix the cards style in server
             )
           )
-        )
+        ),
+        ##
+        ## STEP 3
+        sidebarLayout(
+          sidebarPanel(
+            h3("Step 3 (Optional)"),
+            p("Alternative Design factors"),
+            fluidRow( 
+              column(4, uiOutput("k_input")),
+              column(4, uiOutput("khat_input")),
+              column(4, uiOutput("Q_input"))
+            ),
+            uiOutput("estimatebutton")
+          ),
+          mainPanel()
+        ),
+        
+        wellPanel()
 )
