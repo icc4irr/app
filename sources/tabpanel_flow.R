@@ -1,6 +1,9 @@
 
 # tabpanel - Flowchart -------------------------------------------------
 ICCs <- c("ICC(C,1)", "ICC(Q,1)", "ICC(C,k)", "ICC(Q,\\widehat{k})", "ICC(A,1)", "ICC(A,k)", "ICC(A,\\widehat{k})", "ICC(1)", "ICC(k)", "ICC(\\widehat{k})")
+flowchart_card_style <- "
+    font-size: 25px;
+  "
 tabpanel_flow <- tabPanel(
   "Flowchart",
   #titlePanel("Estimate Interrater Reliability with ICCs"),
@@ -64,11 +67,9 @@ Inferences?",
       br(),
       h3("Your Chosen ICC:"),
       card(
-        card_body(
-          uiOutput("icc_result")
-        ),
-        class = "mb-3"  # Optional margin-bottom
-      ),
+          uiOutput("icc_result"), style = flowchart_card_style
+        )
+      ,
       br(),
       #h4("Decision Path Summary:"), # remove bc it was complicated if Step 2 was skipped
       #textOutput("path_summary")
