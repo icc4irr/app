@@ -111,6 +111,7 @@ server <- function(input, output, session) {
     # Analyses for Plausible values
     if(input$format == "PVs"){
       dataset <- data1()
+      set.seed(12345)
       ICCsests <- estICC_PVs(dataset, subjects = input$subject, raters = input$rater,
                              k = input$k, khat = input$khat, Q = input$Q)
       
@@ -128,6 +129,7 @@ server <- function(input, output, session) {
       } else {
         dataset <- data1()
       }
+      set.seed(12345)
       ICCsests <- estICCs(dataset, Y = input$Y, subjects = input$subject, raters = input$rater,
                           estimator = "MLE", 
                           #response = "continuous", 
