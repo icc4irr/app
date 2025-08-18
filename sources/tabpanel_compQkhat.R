@@ -16,7 +16,7 @@ tabpanel_compQkhat <- tabPanel(
     mainPanel(
       tabsetPanel(
         div(style = "height: 180px; overflow-y: auto;",
-            DT::dataTableOutput("table2"))
+            DT::dataTableOutput("dat2"))
       )
     )
   ),

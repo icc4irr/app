@@ -73,7 +73,5 @@ tabpanel_estIRR <- tabPanel(
             uiOutput("estimatebutton")
           ),
           mainPanel()
-        ),
-        
-        wellPanel()
+        )
 )
