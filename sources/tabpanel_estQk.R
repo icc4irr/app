@@ -1,17 +1,60 @@
 
 # Tabpanel - Estimate Q/khat ----------------------------------------------
 
-tabpanel_estQk <- tabPanel("Dataset 2",
-         sidebarLayout(
-           sidebarPanel(
-             fileInput("file2", "Upload CSV file for Dataset 2", accept = ".csv"),
-             uiOutput("cols_ui2")
-           ),
-           mainPanel(
-             tabsetPanel(
-               tabPanel("Data Table", tableOutput("table2")),
-               tabPanel("Summary Statistics", verbatimTextOutput("summary2"))
-             )
-           )
-         )
+tabpanel_estQk <- tabPanel(
+  "Estimate Design Factors",
+  wellPanel(
+    h4("Input Design Features")
+  ),
+  sidebarLayout(
+    sidebarPanel(
+      fluidRow(
+        column(6,
+               wellPanel(
+                 style = "background-color: #fcfcfc; border: none",
+                 numericInput("NSubjects", "Number of subjects:", 240)
+               )
+        ),
+        column(6,
+               wellPanel(
+                 style = "background-color: #fcfcfc; border: none",
+                 numericInput("NRaters", "Number of raters:", 6)
+               )
+        )
+      ),
+      fluidRow(
+        column(6,
+               wellPanel(
+                 style = "background-color: #fcfcfc; border: none",
+                 numericInput("NRperS", "Number of raters per subject:", 2)
+               )
+        ),
+        column(6,
+               wellPanel(
+                 style = "background-color: #fcfcfc; border: none",
+                 selectInput("Design", "Observational Design:",
+                             choices = c(
+                               Random = "random",
+                               Anker = "anker",
+                               Block = "block"
+                             ),
+                             selected = "random")
+               )
+        )
+      ),
+    wellPanel(
+      style = "background-color: transparent; border: none; text-align: center;",
+      uiOutput("estQkhatbutton")
+    )
+  ),
+    mainPanel(
+      tabsetPanel(
+        tabPanel("Results",
+                 uiOutput("estQkhat_card")
+        ),
+        tabPanel("Table", DT::dataTableOutput(("Qktab"))),
+      )
+    )
+  )
 )
+
