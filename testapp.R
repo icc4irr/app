@@ -1,7 +1,7 @@
 library(shiny)
 library(DT)
 library(bslib)
-library(haven)
+library(foreign)
 library(readxl)
 lapply(list.files("sources/"), \(x) source(paste0("sources/",x)))
 
@@ -38,7 +38,7 @@ server <- function(input, output, session) {
     } else if (ext == "rds") {
       readRDS(path)
     } else if (ext == "sav") {
-      haven::read_sav(path)
+      foreign::read.spss(path, to.data.frame = TRUE)
     } else if (ext == "xlsx") {
       readxl::read_excel(path)
     } else {
@@ -350,7 +350,7 @@ server <- function(input, output, session) {
     } else if (ext == "rds") {
       readRDS(path)
     } else if (ext == "sav") {
-      haven::read_sav(path)
+      foreign::read.spss(path, to.data.frame = TRUE)
     } else if (ext == "xlsx") {
       readxl::read_excel(path)
     } else {
@@ -360,7 +360,7 @@ server <- function(input, output, session) {
   })
   
   # base DT:: output for tables
-  output$table2 <- DT::renderDataTable({
+  output$dat2 <- DT::renderDataTable({
     req(data2())
     data2()
   }, options = list(scrollY = 500, paging = FALSE, searching = FALSE))
@@ -432,8 +432,13 @@ server <- function(input, output, session) {
   ## New yable output
   output$Qktab_comp <- DT::renderDataTable({
     req(comp_model()$khat_comp)
-    as.data.frame.matrix(comp_model()$Qktab_comp)
-  }, options = list(scrollY = 500, paging = FALSE, searching = FALSE))
+    tmpdf <- as.data.frame.matrix(comp_model()$Qktab_comp)
+    colnames(tmpdf) <- paste("Rater", colnames(tmpdf))
+    tmpdf <- cbind(Subject = rownames(tmpdf), tmpdf)
+    as.data.frame(tmpdf)
+  }, 
+  rownames = FALSE,
+  options = list(scrollY = 500, paging = FALSE, searching = FALSE))
 # -------------------------------------------------------------------------
 # Tab: Estimate Q/khat ----------------------------------------------------
 # -------------------------------------------------------------------------
@@ -506,8 +511,13 @@ server <- function(input, output, session) {
   ## New yable output
   output$Qktab <- DT::renderDataTable({
     req(Qkhatestmodel()$khat)
-    as.data.frame.matrix(Qkhatestmodel()$Qktab)
-  }, options = list(scrollY = 500, paging = FALSE, searching = FALSE))
+    tmpdf <- as.data.frame.matrix(Qkhatestmodel()$Qktab)
+    colnames(tmpdf) <- paste("Rater", colnames(tmpdf))
+    tmpdf <- cbind(Subject = rownames(tmpdf), tmpdf)
+    as.data.frame(tmpdf)
+  }, 
+  rownames = FALSE,
+  options = list(scrollY = 500, paging = FALSE, searching = FALSE))
   
 
   # -------------------------------------------------------------------------
