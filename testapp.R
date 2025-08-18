@@ -1,16 +1,20 @@
 library(shiny)
 library(DT)
 library(bslib)
+library(haven)
+library(readxl)
 lapply(list.files("sources/"), \(x) source(paste0("sources/",x)))
 
 ## MANUAL
 source("ICCfunctions_tj.R")
+source("generateData_function.R")
 ui <- navbarPage("ICC4IRR", # App title
                  theme = bs_theme(preset = "lux"),
                  #input_dark_mode(id = "mode"),
-                 #tabpanel_home,
+                 #tabpanel_home, 
                  tabpanel_estIRR,
                  tabpanel_flow,
+                 tabpanel_compQkhat,
                  tabpanel_estQk,
                  tabpanel_about)
 
@@ -29,8 +33,12 @@ server <- function(input, output, session) {
       read.table(path, header = TRUE, sep = "", quote="\"")
     } else if (ext == "rds") {
       readRDS(path)
+    } else if (ext == "sav") {
+      haven::read_sav(path)
+    } else if (ext == "xlsx") {
+      readxl::read_excel(path)
     } else {
-      showNotification("Unsupported file type. Please upload .csv, .txt, or .rds.", type = "error")
+      showNotification("Unsupported file type. Please upload .csv, .txt, .rds, .sav, or .xlsx.", type = "error")
       NULL
     }
   })
@@ -52,6 +60,7 @@ server <- function(input, output, session) {
     req(data1(), input$col)
     summary(data1()[, input$col, drop = FALSE])
   })
+  
   ## -- ICC Arguments
   # subjects
   output$subject <- renderUI({
@@ -80,7 +89,7 @@ server <- function(input, output, session) {
                 selected = "Y", ## only for development !! @todo
                 multiple = FALSE)
   })
-  ## ##.... LONG - WIDE
+  ## ##.... LONG - WIDE @todo ?
   output$format <- renderUI({
     req(data1())
     selectInput("format", "Data Type:", 
@@ -98,14 +107,14 @@ server <- function(input, output, session) {
                  #     border-radius: 6px; padding: 8px 16px; font-size: 16px; font-weight: bold;")
   })
   # model
-  model <- eventReactive(input$estimateICCs, { ## BUTTON!!!
+  model <- eventReactive(input$estimateICCs, { 
     # Analyses for Plausible values
     if(input$format == "PVs"){
       dataset <- data1()
       ICCsests <- estICC_PVs(dataset, subjects = input$subject, raters = input$rater,
                              k = input$k, khat = input$khat, Q = input$Q)
       
-    } else {  req(data1())
+    } else {req(data1())
       # Analyses for Observed variables
       if(input$format == "wide") {
         dataset <- reshape(data = data1(), # wide-format  data
@@ -130,12 +139,20 @@ server <- function(input, output, session) {
     }
     
     list(ICCs = ICCsests$ICCs, variances = ICCsests$sigmas, 
-         raterDesign = cbind(ICCsests$Q, ICCsests$khat, ICCsests$k))
+         raterDesign = list(q = ICCsests$Q, khat = ICCsests$khat, k = ICCsests$k))
   })
+  ## Old table output:
   output$ICCs <- renderTable({
     req(model()$ICCs)
     model()$ICCs
   }, rownames = TRUE)
+  output$variances <- renderTable({
+    req(model()$variances)
+    model()$variances
+  }, rownames = TRUE)
+  
+ 
+  ## NEW separately:
   ## Output per ICC for better print:
   output$icca1 <- renderUI({
     req(model()$ICCs)
@@ -186,14 +203,59 @@ server <- function(input, output, session) {
              "SE = ", round(model()$ICCs[6, 4], 2), "$$"))
   })
   
-  ## ICC card output from UI:
-  # put it here instead of UI bc we use req()
+  ## Variances output:
+  output$S_s <- renderUI({
+    req(model()$variances)
+    withMathJax(
+      paste0("$$ \\sigma^{2}_{s} = ", round(model()$variances[1, 1], 2), ", \\; ",
+             "95\\%~CI~[", round(model()$variances[1, 2], 2), ",\\; ",
+             round(model()$variances[1, 3], 2), "], \\; ",
+             "SE = ", round(model()$variances[1, 4], 2), "$$"))
+  })
+  output$S_r <- renderUI({
+    req(model()$variances)
+    withMathJax(
+      paste0("$$ \\sigma^{2}_{r} = ", round(model()$variances[2, 1], 2), ", \\; ",
+             "95\\%~CI~[", round(model()$variances[2, 2], 2), ",\\; ",
+             round(model()$variances[2, 3], 2), "], \\; ",
+             "SE = ", round(model()$variances[2, 4], 2), "$$"))
+  })
+  output$S_sr <- renderUI({
+    req(model()$variances)
+    withMathJax(
+      paste0("$$ \\sigma^{2}_{sr} = ", round(model()$variances[3, 1], 2), ", \\; ",
+             "95\\%~CI~[", round(model()$variances[3, 2], 2), ",\\; ",
+             round(model()$variances[3, 3], 2), "], \\; ",
+             "SE = ", round(model()$variances[3, 4], 2), "$$"))
+  })
+  
+  ## Rater Design outputs
+  output$raterDesign_Q <- renderUI({
+    req(model()$raterDesign)
+    withMathJax(paste0("$$Q = ",round(model()$raterDesign$q,2),"$$"))
+  })
+  output$raterDesign_k <- renderUI({
+    req(model()$raterDesign)
+    withMathJax(paste0("$$k = ",round(model()$raterDesign$k,2),"$$"))
+  })
+  output$raterDesign_khat <- renderUI({
+    req(model()$raterDesign)
+    withMathJax(paste0("$$\\widehat{k} = ",round(model()$raterDesign$khat,2),"$$"))
+  })
+  
+  ## Custom style @todo check style
   custom_card_style <- "
     background: linear-gradient(45deg, #f5f5f5, #f6f6f6);
     border: none;
     border-radius: 0px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    font-size: 16px;
   "
+  
+  ## CARDS OUPTUT ALL
+  ## ICC main output
+  ## ICC card output from UI:
+  # put it here instead of UI bc we use req()
   output$icc_cards<- renderUI({
     req(model()$ICCs)
     page_fillable(
@@ -208,43 +270,209 @@ server <- function(input, output, session) {
       )
     )
   })
-  output$variances <- renderTable({
+  output$variances_cards<- renderUI({
     req(model()$variances)
-    model()$variances
-  }, rownames = TRUE)
+    page_fillable(
+      layout_columns(
+        card(uiOutput("S_s")   , style = custom_card_style ),
+        card(uiOutput("S_r")   , style = custom_card_style ),
+        card(uiOutput("S_sr")  , style = custom_card_style),
+        col_widths = rep(12, 3)
+      )
+    )
+  })
   
-  output$raterDesign <- renderTable({
+  output$RaterDesign_cards<- renderUI({
     req(model()$raterDesign)
-    model()$raterDesign
-  }, rownames = TRUE)
-  
+    page_fillable(
+      layout_columns(
+        card(uiOutput("raterDesign_k")   , style = custom_card_style ),
+        card(uiOutput("raterDesign_khat")   , style = custom_card_style ),
+        card(uiOutput("raterDesign_Q"), style = custom_card_style),
+        col_widths = c(4, 4, 4) #=12
+      )
+    )
+  })
   
 # -------------------------------------------------------------------------
-# Tab 2 -------------------------------------------------------------------
-  
-  # Dataset 2 reactive
+# Tab: Compute Q/khat ----------------------------------------------------
+# -------------------------------------------------------------------------  
+  # Dataset 2 for cCompute Q/khat
   data2 <- reactive({
     req(input$file2)
-    read.csv(input$file2$datapath)
+    ext <- tools::file_ext(input$file2$name)
+    path <- input$file2$datapath
+    
+    if (ext == "csv") {
+      read.csv(path)
+    } else if (ext == "txt") {
+      read.table(path, header = TRUE, sep = "", quote="\"")
+    } else if (ext == "rds") {
+      readRDS(path)
+    } else if (ext == "sav") {
+      haven::read_sav(path)
+    } else if (ext == "xlsx") {
+      readxl::read_excel(path)
+    } else {
+      showNotification("Unsupported file type. Please upload .csv, .txt, .rds, .sav, or .xlsx.", type = "error")
+      NULL
+    }
   })
   
-  output$cols_ui2 <- renderUI({
+  # base DT:: output for tables
+  output$table2 <- DT::renderDataTable({
     req(data2())
-    selectInput("cols2", "Select column(s) for summary:", choices = names(data2()), multiple = TRUE)
-  })
+    data2()
+  }, options = list(scrollY = 500, paging = FALSE, searching = FALSE))
   
-  output$table2 <- renderTable({
+  # subjects
+  output$subject_comp <- renderUI({
     req(data2())
-    head(data2(), 20)
+    selectInput("subject_comp",
+                label = HTML("Select column name for <b style='text-shadow: .5px .5px .5px rgba(0,0,0,0.4);'>subjects</b>:"),
+                choices = names(data2()), 
+                selected = "subject", ## only for development !! @todo
+                multiple = FALSE)
+  })
+  # raters
+  output$rater_comp <- renderUI({
+    req(data2())
+    selectInput("rater_comp", 
+                label = HTML("Select column name for <b style='text-shadow: .5px .5px .5px rgba(0,0,0,0.4);'>raters</b>:"),
+                choices = names(data2()), 
+                selected = "rater", ## only for development !! @todo
+                multiple = FALSE)
+  })
+  # Button
+  output$computebutton <- renderUI({
+    req(data2())
+    actionButton("computebutton", "Compute", icon = icon("cogs"))
   })
   
-  output$summary2 <- renderPrint({
-    req(data2(), input$cols2)
-    summary(data2()[, input$cols2, drop = FALSE])
+  ## Compute Q khat Function part:
+  comp_model <- eventReactive(input$computebutton, {
+    #req(input$subject_comp, input$rater_comp)
+    
+    compQktab <- table(data2()[[input$subject_comp]], data2()[[input$rater_comp]])
+    
+    compQkhat <- computeQkhat(
+      data2(),
+      subjects = input$subject_comp,
+      raters = input$rater_comp
+    )
+    list(
+      Qktab_comp = compQktab,
+      Q_comp = compQkhat["Q"],
+      khat_comp = compQkhat["khat"]
+    )
   })
+  
+  ## new math output
+  output$Q_comp_math <- renderUI({
+    req(comp_model()$Qktab_comp)
+    withMathJax(paste0("$$Q = ",round(as.numeric(comp_model()$Q_comp),2),"$$"))
+  })
+  output$khat_comp_math <- renderUI({
+    req(comp_model()$khat_comp)
+    withMathJax(paste0("$$\\widehat{k} = ",round(as.numeric(comp_model()$khat_comp),2),"$$"))
+  })
+  
+  ## put new math output in a card
+  output$compQkhat_card <- renderUI({
+    req(comp_model()$khat_comp)
+    page_fillable(
+      layout_columns(
+        card(uiOutput("Q_comp_math")   , style = custom_card_style ),
+        card(uiOutput("khat_comp_math")   , style = custom_card_style ),
+        col_widths = c(6,6) #=12
+      )
+    )
+  })
+  
+  ## New yable output
+  output$Qktab_comp <- DT::renderDataTable({
+    req(comp_model()$khat_comp)
+    as.data.frame.matrix(comp_model()$Qktab_comp)
+  }, options = list(scrollY = 500, paging = FALSE, searching = FALSE))
+# -------------------------------------------------------------------------
+# Tab: Estimate Q/khat ----------------------------------------------------
+# -------------------------------------------------------------------------
+  
+  #custom_btn_name <- withMathJax(paste0("Estimate", "$$Q~ \\widehat{k}$$"))
+  output$estQkhatbutton <- renderUI({
+    actionButton("estQkhatbutton",
+                 #custom_btn_name,
+                 "Estimate",
+                 icon = icon("cog")
+                 )
+  })
+  
+  Qkhatestmodel <- eventReactive(input$estQkhatbutton, { 
+    
+    ## mock data generation:
+    datQkhat <- generateData(
+      Subjects = input$NSubjects,
+      Raters = input$NRaters,
+      RatersSub = input$NRperS,
+      Design = input$Design
+    )
+    # tabulate
+    Qktab <- table(datQkhat$subject, datQkhat$rater)
+    # computeQkhat()
+    Qkhat <- computeQkhat(datQkhat, subjects = "subject", raters = "rater")
+    
+    list(Qktab = Qktab,
+         Qhat = Qkhat["Q"],
+         khat = Qkhat["khat"])
+  })
+  
+  ## Old table output: 
+  #output$Qhat <- renderTable({
+  #  req(Qkhatestmodel()$Qhat)
+  #  round(Qkhatestmodel()$Qhat,2)
+  #}, rownames = FALSE)
+  #
+  #output$khat <- renderTable({
+  #  req(Qkhatestmodel()$khat)
+  #  round(Qkhatestmodel()$khat,2)
+  #}, rownames = FALSE)
+  #
+  #output$Qktab <- renderTable({
+  #  Qkhatestmodel()$Qkhat
+  #})
+  
+  ## new math output
+  output$Q_est_math <- renderUI({
+      req(Qkhatestmodel()$Qhat)
+    withMathJax(paste0("$$Q = ",round(as.numeric(Qkhatestmodel()$Qhat),2),"$$"))
+    })
+  output$khat_est_math <- renderUI({
+    req(Qkhatestmodel()$khat)
+    withMathJax(paste0("$$\\widehat{k} = ",round(as.numeric(Qkhatestmodel()$khat),2),"$$"))
+  })
+  
+  ## put new math output in a card
+  output$estQkhat_card <- renderUI({
+    req(Qkhatestmodel()$khat)
+    page_fillable(
+      layout_columns(
+        card(uiOutput("Q_est_math")   , style = custom_card_style ),
+        card(uiOutput("khat_est_math")   , style = custom_card_style ),
+        col_widths = c(6,6) #=12
+      )
+    )
+  })
+  
+  ## New yable output
+  output$Qktab <- DT::renderDataTable({
+    req(Qkhatestmodel()$khat)
+    as.data.frame.matrix(Qkhatestmodel()$Qktab)
+  }, options = list(scrollY = 500, paging = FALSE, searching = FALSE))
   
 
-# FlowChart Server --------------------------------------------------------
+  # -------------------------------------------------------------------------
+  # FlowChart Server --------------------------------------------------------
+  # -------------------------------------------------------------------------
 
   # Reactive values to store the current state of selections and the result
   rv <- reactiveValues(
@@ -385,7 +613,7 @@ server <- function(input, output, session) {
   })
   
   # inal ICC result
-  # @todo make it nice
+  # @todo look nice?
   output$icc_result <- renderUI({
     withMathJax(paste0("$$", rv$Ans, "$$"))
   })
@@ -401,5 +629,5 @@ server <- function(input, output, session) {
   
 }
 
-options(shiny.port = 8001)
+options(shiny.port = 5001)
 shinyApp(ui, server)
