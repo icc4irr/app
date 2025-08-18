@@ -17,7 +17,7 @@ tabpanel_estIRR <- tabPanel(
          sidebarLayout(
            sidebarPanel(
              h2("Step 1"),
-             fileInput("file1", "Upload your data", accept = c(".rds", ".Rdat", ".csv", ".txt")),
+             fileInput("file1", "Upload your data", accept = c(".rds", ".Rdat", ".csv", ".txt", ".sav", ".xlsx")),
              uiOutput("col")
              
            ),
@@ -47,11 +47,12 @@ tabpanel_estIRR <- tabPanel(
           ),
           mainPanel(
             tabsetPanel(
-              #tabPanel("Intra-Class Correlations (ICCs)", uiOutput("ICCs")),
               tabPanel("Intra-Class Correlations (ICCs)",
                        uiOutput("icc_cards")), # fix the cards style in server
-              tabPanel("Variances", uiOutput("variances")),
-              tabPanel("Rater Design", uiOutput("raterDesign"))
+              tabPanel("Variances", 
+                       uiOutput("variances_cards")),
+              tabPanel("Rater Design", 
+                       uiOutput("RaterDesign_cards"))
             )
           )
         )
