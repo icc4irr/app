@@ -31,7 +31,7 @@ tabpanel_about <- tabPanel("About",
                        coefficient for interrater reliability, with applications to incomplete observational 
                        designs. ",em("Psychological Methods, 29"),"(5), 967–979.", 
                        a("https://doi.org/10.1037/met0000516", href = "https://doi.org/10.1037/met0000516", target = "_blank")),
-               tags$li("•	Ten Hove, D., Jorgensen, T. D., & Van der Ark, L. A. (2025). How to estimate intraclass correlation coefficients 
+               tags$li("Ten Hove, D., Jorgensen, T. D., & Van der Ark, L. A. (2025). How to estimate intraclass correlation coefficients 
                        for interrater reliability from planned incomplete data. ", em("Multivariate Behavioral Research. ")),
                        a("https://doi.org/10.1080/00273171.2025.2507745", href = "https://doi.org/10.1080/00273171.2025.2507745", target = "_blank"),        
                tags$li(a("R Project", href = "https://github.com/icc4irr", target = "_blank")),
