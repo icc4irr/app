@@ -114,6 +114,6 @@ tabpanel_estIRR <- tabPanel(
           ),
           mainPanel()
         ),
-        br(),
-        br()
+        br(), # gap above footer
+        br()  # gap above footer
 )
