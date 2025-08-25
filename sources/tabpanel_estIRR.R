@@ -14,7 +14,7 @@ tabpanel_estIRR <- tabPanel(
                               withMathJax(
                                 p("Use this tab to estimate the interrater reliability from (planned-incomplete) observation data. 
                                 The program uses maximum likelihood estimation of an hierarchical linear model to estimate 
-                                intraclass correlation coeefficients (ICCs) and provides Monte-Carlo confidence intervals for 
+                                intraclass correlation coefficients (ICCs) and provides Monte-Carlo confidence intervals for 
                                 these ICCs (see ",
                                 a("Ten Hove et al., 2025, Multivariate Behavioral Research", href = "https://doi.org/10.1080/00273171.2025.2507745", target = "_blank"), 
                                 "). The data should be provided in long-format, meaning that each row should represent a 
@@ -28,7 +28,7 @@ tabpanel_estIRR <- tabPanel(
                                 h6("• Output:"),
                                 "Estimated variance components (subjects, raters, residual), 
                                 Design factors (",
-                                HTML("\\(k\\)"), " = total number of raters per subject,", 
+                                HTML("\\(k\\)"), " = total number of raters,", 
                                 HTML("\\(\\widehat{k}\\)"), " = harmonic mean number of raters per subject,",
                                 HTML("\\(Q\\)")," = proportion of non-overlapping raters across subjects; see ",
                                 a("Ten Hove et al., 2024, Psychological Methods", href="https://doi.org/10.1037/met0000516", target = "_blank"),  

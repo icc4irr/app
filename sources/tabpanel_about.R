@@ -5,9 +5,9 @@ tabpanel_about <- tabPanel("About",
          fluidPage(
            titlePanel("About this App"),
            wellPanel(
-             p("ICC4IRR is a shiny application to estimate interrater reliability using 
-             intraclass correlation coefficients from incomplete data, resulting from 
-             planned-missing observation designs in which raters vary across subjects."),
+             p("ICC4IRR is a shiny application to estimate interrater reliability (IRR) 
+               from quantitative planned incomplete data, resulting from observation studies 
+               in which raters (partly) vary across subjects."),
              hr(),
              h6("Authors:"),
              p("Tasos Psychogyiopoulos, Letty Koopman and Debby ten Hove"),
