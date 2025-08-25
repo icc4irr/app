@@ -38,7 +38,7 @@ generateData <- function(Subjects = Subjects,
       dat$rater <- raters
     } else {
       # In case of anker-rater designs
-      if(Design== "anker"){
+      if(Design== "anchor"){
         # Assign anker rater to each subject
         dat$rater <- NA
         dat$rater[seq(1, nrow(dat), by = RatersSub)] <- 1
