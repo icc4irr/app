@@ -7,15 +7,17 @@ flowchart_card_style <- "
 tabpanel_flow <- tabPanel(
   "Flowchart",
   #titlePanel("Estimate Interrater Reliability with ICCs"),
+  accordion(
+    accordion_panel(
+      title = "Follow the steps to determine the appropriate ICC:",
+      wellPanel(
+        #h4("Follow the steps to determine the appropriate ICC:"),
+        p("Use this tab to decide which ICC you should interpret. 
+          See ",a("Ten Hove et al. (2024, Psychological Methods)", href = "https://doi.org/10.1037/met0000516", target = "_blank"),
+          "for more information about each choice to make. ")
+      ) # wellpanel
+    )), #accordion
   
-  wellPanel(
-    h4("Follow the steps to determine the ICC:"),
-    # tags$ul(
-    #   tags$li("Upload a dataset"),
-    #   tags$li("Select the columns of interest & and the desired ICC"),
-    #   tags$li("Click Estimate IRR & inspect the results")
-    # )
-  ),
   ## uplaod file and output panels
   # Sidebar layout for inputs and output
   sidebarLayout(

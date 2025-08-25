@@ -3,9 +3,21 @@
 
 tabpanel_estQk <- tabPanel(
   "Estimate Design Factors",
-  wellPanel(
-    h4("Input Design Features")
-  ),
+  accordion(
+    accordion_panel(
+      title = "Estimate Design Factors:",
+      wellPanel(
+   # h4("Input Design Features")
+        p("Use this tab to estimate design factors for different potential observation designs. 
+          You can choose between ", em("randomly assigned raters")," for each subject, a ", em("block-design")," in which 
+          subsets of raters are—as a group—assigned to subsets of subjects, or an ",
+          em("anchor-rater design")," which each subject is observed by the same anchor-rater, and one or more randomly assigned 
+          raters from a larger rater pool ",
+          a("(see Ten Hove et al., 2025, Multivarate Behavioral Research).", href = "https://doi.org/10.1080/00273171.2025.2507745", 
+            target = "_blank")
+        )
+      ) # wellpanel
+    )), #accordion
   sidebarLayout(
     sidebarPanel(
       fluidRow(
@@ -35,7 +47,7 @@ tabpanel_estQk <- tabPanel(
                  selectInput("Design", "Observational Design:",
                              choices = c(
                                Random = "random",
-                               Anker = "anker",
+                               Anchor = "anchor",
                                Block = "block"
                              ),
                              selected = "random")
@@ -52,7 +64,7 @@ tabpanel_estQk <- tabPanel(
         tabPanel("Results",
                  uiOutput("estQkhat_card")
         ),
-        tabPanel("Table", DT::dataTableOutput(("Qktab"))),
+        tabPanel("Design Table", DT::dataTableOutput(("Qktab"))),
       )
     )
   )

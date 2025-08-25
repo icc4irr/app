@@ -3,9 +3,20 @@
 
 tabpanel_compQkhat <- tabPanel(
   "Compute Design Factors",
-  wellPanel(
-    h4("Compute Q khat given your data:"),
-  ),
+  accordion(
+    accordion_panel(
+        title = "Compute Design Factors:",
+      wellPanel(
+      #h4("Compute Q khat given your data:"),
+        p("Use this tab to compute the design factors  based on the planned subject-rater 
+          combinations in our ultimate study. The data should be provided in long-format, 
+          meaning that each row should represent a subject-rater combination and two columns 
+          should indicate the subject IDs and rater IDs. This is similar to the first two columns
+          in the ", em("`Example application data`")," in ",
+          a("Ten Hove et al. (2025, Multivariate Behavioral Research)", 
+            href= "https://doi.org/10.1080/00273171.2025.2507745", target = "_blank"),".")
+      ) # wellpanel
+    )), #accordion
   ## uplaod file and output panels
   sidebarLayout(
     sidebarPanel(
@@ -34,7 +45,7 @@ tabpanel_compQkhat <- tabPanel(
         tabPanel("Results",
                  uiOutput("compQkhat_card")
         ),
-        tabPanel("Table", DT::dataTableOutput(("Qktab_comp"))),
+        tabPanel("Design Table", DT::dataTableOutput(("Qktab_comp"))),
       )
     )
   )
