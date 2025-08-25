@@ -3,6 +3,8 @@ library(DT)
 library(bslib)
 library(foreign)
 library(readxl)
+library(Matrix)
+library(lme4)
 lapply(list.files("sources/"), \(x) source(paste0("sources/",x)))
 
 ## MANUAL
