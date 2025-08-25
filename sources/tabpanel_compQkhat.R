@@ -38,7 +38,8 @@ tabpanel_compQkhat <- tabPanel(
         column(6, uiOutput("subject_comp")),
         column(6, uiOutput("rater_comp"))
       ),
-      uiOutput("computebutton")
+      uiOutput("computebutton"),
+      br(),br()
     ),
     mainPanel(
       tabsetPanel(

@@ -43,7 +43,7 @@ tabpanel_estIRR <- tabPanel(
                               p(
                                 h6("• Alternative Design Factors?"),
                                 "Will your ultimate study use a different observation design than was used in the uploaded data 
-                                set (e.g., different numbers of raters per subject, or less/more overlapping raters across subjects)?.",
+                                set (e.g., different numbers of raters per subject, or less/more overlapping raters across subjects)?",
                                 "Use the Tab ",em("`Compute Design Factors`")," (if you already know the observation design of your ultimate study) 
                                 or ",em("`Estimate Design Factors`")," (if you still need to decide about the observation design of your primary study) 
                                 to find the relevant values for ", HTML("\\(\\widehat{k}\\)")," and ", HTML("\\(Q\\)"),
@@ -109,11 +109,17 @@ tabpanel_estIRR <- tabPanel(
               column(4, uiOutput("k_input")),
               column(4, uiOutput("khat_input")),
               column(4, uiOutput("Q_input"))
-            ),
-            uiOutput("estimatebutton")
+            )
           ),
           mainPanel()
         ),
+        sidebarLayout(
+          sidebarPanel(
+            wellPanel(
+              style = "background-color: transparent; border: none; text-align: center;",
+              uiOutput("estimatebutton")
+            )
+          ), mainPanel()),
         br(), # gap above footer
         br()  # gap above footer
 )
