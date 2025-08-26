@@ -40,3 +40,11 @@
 - **Debby ten Hove**  
 
 📧 Contact: [d.ten.hove@vu.nl](mailto:d.ten.hove@vu.nl)  
+---
+
+## 📖 Additional References
+
+- Ten Hove, D., Jorgensen, T. D., & van der Ark, L. A. (2024). Updated guidelines on selecting an intraclass correlation coefficient for interrater reliability, with applications to incomplete observational designs. *Psychological Methods, 29*(5), 967–979. https://doi.org/10.1037/met0000516  
+
+- Ten Hove, D., Jorgensen, T. D., & van der Ark, L. A. (2025). How to estimate intraclass correlation coefficients for interrater reliability from planned incomplete data. *Multivariate Behavioral Research*. https://doi.org/10.1080/00273171.2025.2507745  
+
